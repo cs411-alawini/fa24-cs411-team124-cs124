@@ -12,8 +12,8 @@
 | Member1     |   briancy2@illinois.edu|
 | Member2     |     Gary Wang          |
 | Member2     |  wang570@illinois.edu  |
-| Member3     |                        |
-| Member3     |                        |
+| Member3     |         Evan Lee       |
+| Member3     |   evanel2@illinois.edu |
 
 ## Project Information
 
@@ -24,5 +24,4 @@
 | Video Link  |      TBD      |
 
 ## Project Summary
-
-MealMaker is a website that will allow users to better follow budget restrictions and nutritional goals for groceries. It will calculate the cost of a certain meal the user is interested in, and be able to also find the cost and nutrition of different recipes that follow the user's criteria. Essentially, this website will function as a cookbook, nutrition tracker and financial planner all in one.
+MealMaker is an application that will provide a comprehensive solution for people looking to balance their grocery shopping with economical and nutritional goals. Users will be able to list recipes and ingredients and the website will provide cost totals and nutritional facts, as well as provide some further suggestions. This application will simplify meal planning and grocery shopping.
