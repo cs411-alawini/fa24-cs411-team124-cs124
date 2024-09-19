@@ -19,10 +19,10 @@
 
 |   Info      |        Description     |
 | ----------- | ---------------------- |
-|  Title      |       TBD     |
+|  Title      |      MealMaker     |
 | System URL  |      TBD      |
 | Video Link  |      TBD      |
 
 ## Project Summary
 
-This is a summary of the project!
+MealMaker is a website that will allow users to better follow budget restrictions and nutritional goals for groceries. It will calculate the cost of a certain meal the user is interested in, and be able to also find the cost and nutrition of different recipes that follow the user's criteria. Essentially, this website will function as a cookbook, nutrition tracker and financial planner all in one.
