@@ -4,13 +4,16 @@ from flask_sqlalchemy import SQLAlchemy
 from google.cloud.sql.connector import Connector
 import sqlalchemy
 app = Flask(__name__)
-CORS(app, resources={
-    r"/*": {
-        "origins": ["http://localhost:5173/"],  # Your frontend URL
-        "methods": ["GET", "POST", "PUT", "DELETE"],
-        "allow_headers": ["Content-Type"]
-    }
-})
+CORS(app, 
+     origins=['http://localhost:5173'],  # No trailing slash
+     allow_headers=["Content-Type", "Authorization"],
+     supports_credentials=True)
+
+# Add an explicit OPTIONS route handler
+@app.route('/api/recipes', methods=['OPTIONS'])
+def handle_options():
+    return '', 204
+
 # initialize Python Connector object
 connector = Connector()
 

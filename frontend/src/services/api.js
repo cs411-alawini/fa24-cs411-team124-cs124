@@ -6,11 +6,9 @@ export const api = {
       const response = await fetch(`${API_URL}/recipes`, {
         method: 'GET',
         headers: {
-          'Content-Type': 'application/json',
           'Accept': 'application/json'
         },
-        // Don't use mode: 'no-cors' as it will make response inaccessible
-        credentials: 'include', // Include if you're using cookies
+          credentials: 'include'  // or 'include' if needed
       });
 
       // Proper promise chain for response
