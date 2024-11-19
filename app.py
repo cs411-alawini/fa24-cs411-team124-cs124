@@ -34,12 +34,14 @@ test_select = sqlalchemy.text(
     "SELECT Title FROM Recipe LIMIT 9;",
 )
 
-@app.route('/',methods=['GET'])
-def recipe_test():
+@app.route('/', methods=['GET'])
+def get_recipe_test():
     test_result = db.session.execute(test_select).fetchall()
+    l = []
     for row in test_result:
-        print(row)
-    return "somehow send test_result to a visible spot"
+        l.append(str(row))
+    print(l)
+    return str(l)
 
 
 '''

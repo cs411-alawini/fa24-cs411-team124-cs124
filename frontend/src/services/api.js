@@ -28,7 +28,22 @@ const MOCK_MEAL_PLAN = [
     async getMealPlan(date) {
       // Simulate API delay
       await new Promise(resolve => setTimeout(resolve, 500));
-      return MOCK_MEAL_PLAN;
+      const TEST_MEAL_PLAN = [
+        {
+          day: 'Monday',
+          meals: ['Breakfast: Not Oatmeal' , 'Lunch: Chicken Salad', 'Dinner: Pasta']
+        },
+        {
+          day: 'Tuesday',
+          meals: ['Breakfast: Eggs Benedict', 'Lunch: Sandwich', 'Dinner: Fish']
+        },
+        {
+          day: 'Wednesday',
+          meals: ['Breakfast: Pancakes', 'Lunch: Soup', 'Dinner: Steak']
+        },
+        // Add more days as needed
+      ];
+      return TEST_MEAL_PLAN;
     },
   
     async saveUserSettings(settings) {
