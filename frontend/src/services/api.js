@@ -1,7 +1,7 @@
 const MOCK_MEAL_PLAN = [
     {
       day: 'Monday',
-      meals: ['Breakfast: Oatmeal', 'Lunch: Chicken Salad', 'Dinner: Pasta']
+      meals: ['Breakfast: Oatmeal' , 'Lunch: Chicken Salad', 'Dinner: Pasta']
     },
     {
       day: 'Tuesday',
