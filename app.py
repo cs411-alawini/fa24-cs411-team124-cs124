@@ -1,8 +1,16 @@
 from flask import Flask, jsonify
+from flask_cors import CORS 
 from flask_sqlalchemy import SQLAlchemy
 from google.cloud.sql.connector import Connector
 import sqlalchemy
-
+app = Flask(__name__)
+CORS(app, resources={
+    r"/*": {
+        "origins": ["http://localhost:5173/"],  # Your frontend URL
+        "methods": ["GET", "POST", "PUT", "DELETE"],
+        "allow_headers": ["Content-Type"]
+    }
+})
 # initialize Python Connector object
 connector = Connector()
 
@@ -17,7 +25,8 @@ def getconn():
         ip_type="public"  # "private" for private IP
     )
     return conn
-app = Flask(__name__)
+
+
 
 # configure Flask-SQLAlchemy to use Python Connector
 app.config['SQLALCHEMY_DATABASE_URI'] = "mysql+pymysql://"
@@ -31,33 +40,18 @@ db = SQLAlchemy()
 db.init_app(app)
 
 test_select = sqlalchemy.text(
-    "SELECT Title FROM Recipe LIMIT 9;",
+    "SELECT Title FROM Recipe LIMIT 1;",
 )
 
-@app.route('/', methods=['GET'])
-def get_recipe_test():
-    results = db.session.execute(test_select).fetchall()
-    
-    # Debug: Print raw results
-    print("Raw results:", results)
-    
-    # Debug: Print the first row if it exists
-    if results:
-        print("First row:", results[0])
-        print("First row keys:", results[0].keys())
-        
-    # Convert to list of dicts with all columns
-    recipes = []
-    for row in results:
-        recipe_dict = {}
-        for column in row.keys():
-            recipe_dict[column.lower()] = row[column]
-        recipes.append(recipe_dict)
-        
-    print("Processed recipes:", recipes)
-    
-    return jsonify({"recipes": recipes})
-
+@app.route('/api/recipes', methods=['GET'])
+def get_recipes():
+    try:
+        query = sqlalchemy.text("SELECT Title FROM Recipe LIMIT 9;")
+        results = db.session.execute(query).fetchall()
+        recipes = [{"title": row[0]} for row in results]
+        return jsonify({"recipes": recipes})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 '''
 from google.cloud.sql.connector import Connector
