@@ -1,6 +1,12 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 export default function RecipeDisplay({ recipe }) {
+  useEffect(() => {
+    console.log('RecipeDisplay mounted with recipe:', recipe);
+  }, [recipe]);
+
+  console.log('RecipeDisplay rendering with recipe:', recipe);
+
   return (
     <div className="p-4 border rounded-lg hover:shadow-md transition-shadow">
       <h3 className="font-semibold text-lg text-gray-800">
@@ -14,14 +20,6 @@ export default function RecipeDisplay({ recipe }) {
           Ingredients: {recipe.ingredients}
         </p>
       )}
-      {/* Add more fields as they become available */}
     </div>
   );
 }
-
-// Update the relevant section in HomePage.jsx
-<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-  {recipes.map((recipe, index) => (
-    <RecipeDisplay key={index} recipe={recipe} />
-  ))}
-</div>
