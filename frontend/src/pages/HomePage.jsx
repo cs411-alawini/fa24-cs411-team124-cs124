@@ -2,22 +2,26 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Settings, Calendar } from 'lucide-react';
 import { api } from '../services/api';
+import RecipeDisplay from '../components/RecipeDisplay';  // Import the component
 
 export default function HomePage() {
   const navigate = useNavigate();
   const [recipes, setRecipes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [connectionStatus, setConnectionStatus] = useState('');
 
   useEffect(() => {
     const fetchRecipes = async () => {
       try {
         setLoading(true);
         const data = await api.getRecipes();
+        console.log('Fetched recipes:', data); // Debug log
         setRecipes(data.recipes);
+        setError(null);
       } catch (err) {
-        setError('Failed to load recipes');
-        console.error(err);
+        console.error('Error fetching recipes:', err);
+        setError('Failed to load recipes: ' + err.message);
       } finally {
         setLoading(false);
       }
@@ -43,7 +47,7 @@ export default function HomePage() {
           
           <button
             onClick={() => navigate('/menu')}
-            className="flex items-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="flex items-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
           >
             <Calendar size={20} />
             Menu Selection
@@ -66,13 +70,18 @@ export default function HomePage() {
             </div>
           )}
           
+          {/* Using RecipeDisplay component */}
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {recipes.map((recipe, index) => (
-              <div key={index} className="p-4 border rounded-lg hover:shadow-md transition-shadow">
-                <h3 className="font-semibold text-lg text-gray-800">{recipe.title}</h3>
-              </div>
+              <RecipeDisplay key={index} recipe={recipe} />
             ))}
           </div>
+
+          {!loading && recipes.length === 0 && !error && (
+            <div className="text-center py-4 text-gray-500">
+              No recipes found.
+            </div>
+          )}
         </div>
 
         {/* Quick Stats */}

@@ -36,12 +36,27 @@ test_select = sqlalchemy.text(
 
 @app.route('/', methods=['GET'])
 def get_recipe_test():
-    test_result = db.session.execute(test_select).fetchall()
-    l = []
-    for row in test_result:
-        l.append(str(row))
-    print(l)
-    return str(l)
+    results = db.session.execute(test_select).fetchall()
+    
+    # Debug: Print raw results
+    print("Raw results:", results)
+    
+    # Debug: Print the first row if it exists
+    if results:
+        print("First row:", results[0])
+        print("First row keys:", results[0].keys())
+        
+    # Convert to list of dicts with all columns
+    recipes = []
+    for row in results:
+        recipe_dict = {}
+        for column in row.keys():
+            recipe_dict[column.lower()] = row[column]
+        recipes.append(recipe_dict)
+        
+    print("Processed recipes:", recipes)
+    
+    return jsonify({"recipes": recipes})
 
 
 '''
