@@ -3,24 +3,26 @@ const API_URL = 'http://localhost:5000/api';
 export const api = {
   async getRecipes() {
     try {
-      console.log('Attempting to fetch from:', `${API_URL}/recipes`);
-      const response = await fetch(`${API_URL}/recipes`);
-      console.log('Response received:', response);
-      
+      const response = await fetch(`${API_URL}/recipes`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        // Don't use mode: 'no-cors' as it will make response inaccessible
+        credentials: 'include', // Include if you're using cookies
+      });
+
+      // Proper promise chain for response
       if (!response.ok) {
-        console.log('Response not ok, status:', response.status);
-        throw new Error(`Network response was not ok: ${response.status}`);
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
       
+      // Handle the JSON response properly
       const data = await response.json();
-      console.log('Data received:', data);
       return data;
     } catch (error) {
-      console.error('Detailed error:', {
-        message: error.message,
-        stack: error.stack,
-        type: error.name
-      });
+      console.error('Fetch error:', error);
       throw error;
     }
   }
