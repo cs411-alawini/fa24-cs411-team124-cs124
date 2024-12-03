@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Settings, Calendar } from 'lucide-react';
+import { Settings, Utensils } from 'lucide-react';
 import { api } from '../services/api';
 import RecipeDisplay from '../components/RecipeDisplay';
 
@@ -92,13 +92,13 @@ export default function HomePage() {
             
             <button
               onClick={() => {
-                console.log('Navigating to menu');
-                navigate('/menu');
+                console.log('Navigating to meal plan');
+                navigate('/meal-plan');
               }}
               className="flex items-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700"
             >
-              <Calendar size={20} />
-              Menu Selection
+              <Utensils size={20} />
+              Meal Plan
             </button>
           </div>
 

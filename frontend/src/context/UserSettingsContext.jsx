@@ -4,9 +4,9 @@ const UserSettingsContext = createContext();
 
 export function UserSettingsProvider({ children }) {
   const [settings, setSettings] = useState({
-    dietaryRestrictions: [],
-    nutritionalGoals: {},
-    weeklyBudget: 0,
+    dietary_restrictions: '',
+    budget_goal: 0,
+    nutrition_goals: 0
   });
 
   return (

@@ -1,10 +1,11 @@
 import React, { useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
-import HomePage from './pages/HomePage';
-import SettingsPage from './pages/SettingsPage';
-import MenuSelectionPage from './pages/MenuSelectionPage';
+import { AuthProvider } from './context/AuthContext';
 import { UserSettingsProvider } from './context/UserSettingsContext';
-
+import HomePage from './pages/HomePage';
+import LoginPage from './pages/LoginPage';
+import SettingsPage from './pages/SettingsPage';
+import MealPlanPage from './pages/MealPlanPage';
 function App() {
   useEffect(() => {
     console.log('App mounted');
@@ -13,32 +14,27 @@ function App() {
   console.log('App rendering');
 
   return (
-    <UserSettingsProvider>
-      <div className="app-container">
-        {console.log('Inside App return')}
-        <Routes>
-          <Route 
-            path="/" 
-            element={
-              <div>
-                {console.log('Rendering HomePage route')}
-                <HomePage />
-              </div>
-            } 
-          />
-          <Route 
-            path="/settings" 
-            element={
-              <div>
-                {console.log('Rendering Settings route')}
-                <SettingsPage />
-              </div>
-            } 
-          />
-          <Route path="/menu" element={<MenuSelectionPage />} />
-        </Routes>
-      </div>
-    </UserSettingsProvider>
+    <AuthProvider>
+      <UserSettingsProvider>
+        <div className="app-container">
+          {console.log('Inside App return')}
+          <Routes>
+            <Route 
+              path="/" 
+              element={
+                <div>
+                  {console.log('Rendering HomePage route')}
+                  <HomePage />
+                </div>
+              } 
+            />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/meal-plan" element={<MealPlanPage />} />
+            <Route path="/settings" element={<SettingsPage />} />
+          </Routes>
+        </div>
+      </UserSettingsProvider>
+    </AuthProvider>
   );
 }
 
