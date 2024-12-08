@@ -54,10 +54,10 @@ def create_meal_plan():
         else:
             time = 3
         
-        print(type(user_id))
-        print(type(recipe_id))
-        print(type(date))
-        print(type(time))
+        # print(type(user_id))
+        # print(type(recipe_id))
+        # print(type(date))
+        # print(type(time))
         check_query = sqlalchemy.text("""
             SELECT Meal_plan_id FROM Meal_Plan 
             WHERE User_id = :user_id
@@ -80,20 +80,15 @@ def create_meal_plan():
                                              'date': date,
                                              'time': time,
                                              'recipe_id': recipe_id})
+            print("updated")
             
         else:
-            max_id_query = sqlalchemy.text("SELECT MAX(Meal_plan_id) FROM Meal_Plan")
-            max_id = db.session.execute(max_id_query).scalar()
-            if max_id is None:
-                max_id = 0  # Start from 1 if the table is empty
-            new_meal_plan_id = max_id + 1
             query = sqlalchemy.text("""
-                INSERT INTO Meal_Plan (Meal_plan_id, User_id, Date, Time, Recipe_id)
-                VALUES (:meal_plan_id, :user_id, :date, :time, :recipe_id)
-                LIMIT 1;
+                INSERT INTO Meal_Plan (User_id, Date, Time, Recipe_id)
+                VALUES (:user_id, :date, :time, :recipe_id);
             """)
             
-            results = db.session.execute(query, {'meal_plan_id': new_meal_plan_id, 
+            results = db.session.execute(query, {
                                                 'user_id': user_id, 
                                                 'date': date,
                                                 'time': time,
