@@ -1,9 +1,120 @@
-from flask import Blueprint, jsonify
+import traceback
+from flask import Blueprint, request, jsonify
 from ..extensions import db
 import sqlalchemy
 from ..models.recipe import Recipe
+from datetime import datetime
+from enum import Enum
 
 meal_plan_bp = Blueprint('meal_plan', __name__)
+
+
+
+@meal_plan_bp.route('/meal-plans', methods=['GET'])
+def get_meal_plan_for_user_id():
+    try:
+        user_id = request.args.get('user_id', type=int)
+        query = sqlalchemy.text("""
+            SELECT mp.Meal_plan_id, mp.Recipe_id FROM Meal_Plan mp
+            WHERE User_id = :user_id;
+        """)
+        results = db.session.execute(query, {'user_id': user_id}).fetchall()
+        if not results:
+            return jsonify({'error': 'No meal plan found for user'}), 404
+        meal_plans = []
+        for row in results:
+            meal_plan = {'id': row.Meal_plan_id,
+                         'recipe_id': row.Recipe_id
+                         }
+            meal_plans.append(meal_plan)
+
+        
+       
+        #print(meal_plans)
+        return jsonify({'meal_plans': meal_plans})
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+
+@meal_plan_bp.route('/meal-plans', methods=['POST'])
+def create_meal_plan():
+    try:
+        data = request.get_json()
+        user_id = data.get('user_id')
+        recipe_id = data.get('recipe_id')
+        date = data.get('date')
+        timestr = data.get('time')
+        time = ""
+        if timestr == "breakfast":
+            time = 1
+        elif timestr == "lunch":
+            time = 2
+        else:
+            time = 3
+        
+        print(type(user_id))
+        print(type(recipe_id))
+        print(type(date))
+        print(type(time))
+        check_query = sqlalchemy.text("""
+            SELECT Meal_plan_id FROM Meal_Plan 
+            WHERE User_id = :user_id
+            AND Date = :date
+            AND Time = :time
+        """)
+        existing_meal = db.session.execute(check_query, {
+                                            'user_id': user_id, 
+                                            'date': date,
+                                            'time': time,
+                                            }).fetchone()
+        if existing_meal:
+            query = sqlalchemy.text("""
+            UPDATE Meal_Plan
+            SET Recipe_id = :recipe_id
+            WHERE User_id = :user_id AND Date = :date AND Time = :time;
+            """)
+            results = db.session.execute(query, {
+                                             'user_id': user_id, 
+                                             'date': date,
+                                             'time': time,
+                                             'recipe_id': recipe_id})
+            
+        else:
+            max_id_query = sqlalchemy.text("SELECT MAX(Meal_plan_id) FROM Meal_Plan")
+            max_id = db.session.execute(max_id_query).scalar()
+            if max_id is None:
+                max_id = 0  # Start from 1 if the table is empty
+            new_meal_plan_id = max_id + 1
+            query = sqlalchemy.text("""
+                INSERT INTO Meal_Plan (Meal_plan_id, User_id, Date, Time, Recipe_id)
+                VALUES (:meal_plan_id, :user_id, :date, :time, :recipe_id)
+                LIMIT 1;
+            """)
+            
+            results = db.session.execute(query, {'meal_plan_id': new_meal_plan_id, 
+                                                'user_id': user_id, 
+                                                'date': date,
+                                                'time': time,
+                                                'recipe_id': recipe_id})
+            
+        db.session.commit()
+        
+        print("POST COMMIT ")
+        return jsonify({
+            'user_id': results.lastrowid,
+            'message': 'User created successfully'
+        })
+    except Exception as e:
+        print(traceback.format_exc())
+        return jsonify({'error': str(e)}), 500
+
+@meal_plan_bp.route('/meal-plans/<int:plan_id>', methods=['DELETE'])
+def delete_meal_plan(plan_id):
+    return jsonify({'error': 'Could not delete values from meal plan table'}), 404
+
+
 
 @meal_plan_bp.route('/meal-plans/<int:plan_id>/nutrition', methods=['GET'])
 def calculate_meal_plan_nutrition(plan_id):
@@ -11,17 +122,16 @@ def calculate_meal_plan_nutrition(plan_id):
         query = sqlalchemy.text("""
             SELECT r.Recipe_id, r.Title,
                    ri.Ingredient_Name, ri.Quantity, ri.Unit,
-                   in.Carbohydrates, in.Protein, in.Total_fat, in.Kilocalories,
-                   in.Sugar
+                   in_n.Carbohydrates, in_n.Protein, in_n.Total_fat, in_n.Kilocalories,
+                   in_n.Sugar
             FROM Meal_Plan mp
             JOIN Recipe r ON mp.Recipe_id = r.Recipe_id
             JOIN Recipe_Ingredient ri ON r.Recipe_id = ri.Recipe_id
-            JOIN Ingredient_Nutrition in ON ri.Ingredient_Name = in.Ingredient_Name
-            WHERE mp.Meal_plan_id = :plan_id
+            JOIN Ingredient_Nutrition in_n ON ri.Ingredient_Name = in_n.Ingredient_Name
+            WHERE mp.Meal_plan_id = :plan_id;
         """)
         
         results = db.session.execute(query, {'plan_id': plan_id}).fetchall()
-        
         if not results:
             return jsonify({'error': 'Meal plan not found'}), 404
             
@@ -34,7 +144,6 @@ def calculate_meal_plan_nutrition(plan_id):
         }
         
         recipe_nutrition = {}
-        
         for row in results:
             recipe_id = row[0]
             if recipe_id not in recipe_nutrition:
@@ -68,4 +177,5 @@ def calculate_meal_plan_nutrition(plan_id):
         })
         
     except Exception as e:
+        print(traceback.format_exc())
         return jsonify({'error': str(e)}), 500

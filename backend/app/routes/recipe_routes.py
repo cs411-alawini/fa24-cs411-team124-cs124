@@ -4,13 +4,13 @@ import sqlalchemy
 from ..models.recipe import Recipe
 
 recipe_bp = Blueprint('recipes', __name__)
-
+#Returns a list of all recipes that match user settings
 @recipe_bp.route('/recipes', methods=['GET'])
 def get_recipes():
     try:
         query = sqlalchemy.text("""
             SELECT Recipe_id, Title, Instructions, Image_name 
-            FROM Recipe 
+            FROM Recipe
             LIMIT 9;
         """)
         results = db.session.execute(query).fetchall()

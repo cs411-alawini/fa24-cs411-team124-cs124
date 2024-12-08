@@ -20,7 +20,7 @@ export default function LoginPage() {
     e.preventDefault();
     try {
       if (!username.trim()) {
-        setError('Please enter a username');
+        setError('Please enter a username: ');
         return;
       }
 
@@ -36,7 +36,7 @@ export default function LoginPage() {
           ...formData
         };
         
-        console.log('Submitting user data:', userData);
+        console.log('Submitting user data: ', userData);
         const response = await api.createUser(userData);
         if (response.user_id) {
           login(response.user_id);
@@ -44,7 +44,7 @@ export default function LoginPage() {
         }
       }
     } catch (err) {
-      console.error('Auth error:', err);
+    console.error('Auth error:', err);
       setError(isLogin ? 'Login failed. Please try again.' : 'Sign up failed. Please try again.');
     }
   };
@@ -58,10 +58,10 @@ export default function LoginPage() {
       <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-lg shadow">
         <div>
           <h2 className="text-center text-3xl font-bold text-gray-900">
-            {isLogin ? 'Welcome Back' : 'Create Account'}
+            {isLogin ? 'Welcome Back.' : 'Create Account.'}
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
-            {isLogin ? 'Please enter your username to continue' : 'Please fill in your details'}
+            {isLogin ? 'Please enter your username to continue.' : 'Please fill in your details.'}
           </p>
         </div>
 
@@ -74,7 +74,7 @@ export default function LoginPage() {
 
           <div>
             <label htmlFor="username" className="block text-sm font-medium text-gray-700">
-              Username
+              Username:
             </label>
             <input
               id="username"
@@ -106,7 +106,7 @@ export default function LoginPage() {
               className="text-sm text-blue-600 hover:text-blue-500"
               onClick={() => setIsLogin(!isLogin)}
             >
-              {isLogin ? "Don't have an account? Sign up" : 'Already have an account? Login'}
+              {isLogin ? "Don't have an account? Sign up" : 'Already have an account? Login.'}
             </button>
           </div>
         </div>

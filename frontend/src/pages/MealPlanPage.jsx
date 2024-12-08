@@ -96,7 +96,7 @@ export default function MealPlanPage() {
         user_id: userId,
         recipe_id: recipe.id,
         date: date.toISOString().split('T')[0],
-        time: 'dinner'
+        time: 'Dinner'
       });
       
       await loadMealPlans();
