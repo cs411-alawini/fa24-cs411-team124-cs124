@@ -7,10 +7,10 @@ export default function MealPlanPage() {
   const navigate = useNavigate();
   const { userId } = useAuth();
   
-  // All state declarations must be inside the component
   const [mealPlans, setMealPlans] = useState([]);
   const [selectedRecipe, setSelectedRecipe] = useState(null);
   const [selectedDay, setSelectedDay] = useState(null);
+  const [selectedMealTime, setSelectedMealTime] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [recipes, setRecipes] = useState([]);
@@ -87,21 +87,22 @@ export default function MealPlanPage() {
     }
   };
 
-  const handleAddMeal = async (recipe, day) => {
+  const handleAddMeal = async (recipe, day, mealTime) => {
     try {
       const date = new Date();
       date.setDate(date.getDate() + getDayOffset(day));
-      
+
       await api.createMealPlan({
         user_id: userId,
         recipe_id: recipe.id,
         date: date.toISOString().split('T')[0],
-        time: 'Dinner'
+        time: mealTime
       });
-      
+
       await loadMealPlans();
       setSelectedRecipe(null);
       setSelectedDay(null);
+      setSelectedMealTime(null);
     } catch (err) {
       setError('Failed to add meal to plan');
       console.error(err);
@@ -169,33 +170,35 @@ export default function MealPlanPage() {
               <div key={day} className="border rounded-lg p-4">
                 <h3 className="font-medium mb-2">{day}</h3>
                 <div className="space-y-2">
-                  {mealPlans
-                    .filter(plan => new Date(plan.date).toLocaleDateString('en-US', { weekday: 'long' }) === day)
-                    .map((plan) => (
-                      <div 
-                        key={plan.id} 
-                        className="bg-blue-50 p-2 rounded-lg text-sm"
-                      >
-                        <div className="flex justify-between items-center">
-                          <span>{plan.recipes[0]?.title}</span>
-                          <button
-                            onClick={() => handleDeleteMeal(plan.id)}
-                            className="text-red-600 hover:text-red-800"
+                  {['Breakfast', 'Lunch', 'Dinner'].map((mealTime) => (
+                    <div key={mealTime} className="space-y-1">
+                      {mealPlans
+                        .filter(plan => new Date(plan.date).toLocaleDateString('en-US', { weekday: 'long' }) === day && plan.time === mealTime)
+                        .map((plan) => (
+                          <div 
+                            key={plan.id} 
+                            className="bg-blue-50 p-2 rounded-lg text-sm"
                           >
-                            ×
-                          </button>
-                        </div>
-                        <div className="text-xs text-gray-600">
-                          {plan.recipes[0]?.time}
-                        </div>
-                      </div>
-                    ))}
-                  <button
-                    onClick={() => setSelectedDay(day)}
-                    className="w-full mt-2 px-2 py-1 text-sm text-blue-600 hover:bg-blue-50 rounded"
-                  >
-                    + Add Meal
-                  </button>
+                            <div className="flex justify-between items-center">
+                              <span>{plan.time}: {plan.title}</span>
+                              <button
+                                onClick={() => handleDeleteMeal(plan.id)}
+                                className="text-red-600 hover:text-red-800"
+                              >
+                                ×
+                              </button>
+                            </div>
+                            
+                          </div>
+                        ))}
+                      <button
+                        onClick={() => { setSelectedDay(day); setSelectedMealTime(mealTime); }}
+                        className="w-full mt-2 px-2 py-1 text-sm text-blue-600 hover:bg-blue-50 rounded"
+                      >
+                        + Add/Swap {mealTime}
+                      </button>
+                    </div>
+                  ))}
                 </div>
               </div>
             ))}
@@ -203,13 +206,13 @@ export default function MealPlanPage() {
         </div>
 
         {/* Recipe Selection Modal */}
-        {selectedDay && (
+        {selectedDay && selectedMealTime && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
             <div className="bg-white rounded-lg p-6 max-w-md w-full">
               <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-semibold">Add Meal for {selectedDay}</h2>
+                <h2 className="text-xl font-semibold">Add {selectedMealTime} for {selectedDay}</h2>
                 <button
-                  onClick={() => setSelectedDay(null)}
+                  onClick={() => { setSelectedDay(null); setSelectedMealTime(null); }}
                   className="text-gray-500 hover:text-gray-700"
                 >
                   ×
@@ -219,13 +222,10 @@ export default function MealPlanPage() {
                 {recipes.map(recipe => (
                   <button
                     key={recipe.id}
-                    onClick={() => handleAddMeal(recipe, selectedDay)}
+                    onClick={() => handleAddMeal(recipe, selectedDay, selectedMealTime)}
                     className="w-full p-2 text-left hover:bg-gray-50 rounded flex justify-between items-center"
                   >
                     <span>{recipe.title}</span>
-                    <span className="text-sm text-gray-500">
-                      {Math.round(recipe.nutrition?.calories || 0)} cal
-                    </span>
                   </button>
                 ))}
               </div>
@@ -238,24 +238,19 @@ export default function MealPlanPage() {
           <h2 className="text-xl font-semibold mb-4">Weekly Nutrition Summary</h2>
           <div className="grid grid-cols-5 gap-4">
             <div>
-              <p className="text-gray-600">Total Calories</p>
-              <p className="text-2xl font-bold">{Math.round(weeklyNutrition.calories)}</p>
+              <p className="text-gray-600">Total Calories: {Math.round(weeklyNutrition.calories)}C</p>
             </div>
             <div>
-              <p className="text-gray-600">Protein</p>
-              <p className="text-2xl font-bold">{Math.round(weeklyNutrition.protein)}g</p>
+              <p className="text-gray-600">Protein: {Math.round(weeklyNutrition.protein)}g</p>
             </div>
             <div>
-              <p className="text-gray-600">Carbs</p>
-              <p className="text-2xl font-bold">{Math.round(weeklyNutrition.carbohydrates)}g</p>
+              <p className="text-gray-600">Carbs: {Math.round(weeklyNutrition.carbohydrates)}g</p>
             </div>
             <div>
-              <p className="text-gray-600">Fat</p>
-              <p className="text-2xl font-bold">{Math.round(weeklyNutrition.fat)}g</p>
+              <p className="text-gray-600">Fat: {Math.round(weeklyNutrition.fat)}g</p>
             </div>
             <div>
-              <p className="text-gray-600">Sugar</p>
-              <p className="text-2xl font-bold">{Math.round(weeklyNutrition.sugar)}g</p>
+              <p className="text-gray-600">Sugar: {Math.round(weeklyNutrition.sugar)}g</p>
             </div>
           </div>
         </div>
