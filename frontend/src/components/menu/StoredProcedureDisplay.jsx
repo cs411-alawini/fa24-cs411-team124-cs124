@@ -12,17 +12,9 @@ export default function RecipeDisplay({ recipe }) {
       <h3 className="font-semibold text-lg text-gray-800">
         {recipe.title || recipe.name || 'Untitled Recipe'}
       </h3>
-      {recipe.description && (
-        <p className="text-gray-600 mt-2">{recipe.description}</p>
-      )}
-      {recipe.ingredients && (
+      {recipe.calories && (
         <p className="text-sm text-gray-500 mt-1">
-          Ingredients: {recipe.ingredients}
-        </p>
-      )}
-      {recipe.calories && recipe.price &&(
-        <p className="text-sm text-gray-500 mt-1">
-          Calories: {recipe.calories}C        Price: ${recipe.price}
+          Calories: {recipe.calories}
         </p>
       )}
     </div>

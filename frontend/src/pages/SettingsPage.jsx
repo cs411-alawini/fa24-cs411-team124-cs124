@@ -67,6 +67,12 @@ export default function SettingsPage() {
           >
             Back to Home
           </button>
+          <button
+            onClick={() => navigate('/meal-plan')}
+            className="px-6 py-3 bg-gray-600 text-white rounded-lg"
+          >
+            Meal Plan
+          </button>
         </div>
 
         <div className="bg-white rounded-lg shadow p-6">

@@ -98,6 +98,28 @@ export const api = {
     }
   },
 
+  async getAvailableRecipesForUser(userId) {
+    try {
+      const response = await fetch(`${API_URL}/recipes/${userId}`, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json'
+        },
+        credentials: 'include'
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Fetch error:', error);
+      throw error;
+    }
+  },
+
   async getRecipeDetails(recipeId) {
     try {
       const response = await fetch(`${API_URL}/recipes/${recipeId}`, {

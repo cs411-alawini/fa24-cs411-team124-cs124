@@ -81,17 +81,6 @@ export default function HomePage() {
           <div className="flex gap-4 justify-center mb-8">
             <button
               onClick={() => {
-                console.log('Navigating to settings');
-                navigate('/settings');
-              }}
-              className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-            >
-              <Settings size={20} />
-              User Settings
-            </button>
-            
-            <button
-              onClick={() => {
                 console.log('Navigating to meal plan');
                 navigate('/meal-plan');
               }}

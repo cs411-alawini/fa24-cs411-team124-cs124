@@ -50,7 +50,7 @@ export default function UserSettingsForm({ onSubmit, hideSubmit }) {
 
       <div>
         <label className="block text-sm font-medium text-gray-700">
-          Daily Calorie Target
+          Weekly Calorie Target
         </label>
         <input
           type="number"
@@ -59,7 +59,7 @@ export default function UserSettingsForm({ onSubmit, hideSubmit }) {
           value={formData.nutrition_goals}
           onChange={handleChange}
           min="0"
-          placeholder="Enter your daily calorie target"
+          placeholder="Enter your weekly calorie target"
         />
       </div>
     </div>

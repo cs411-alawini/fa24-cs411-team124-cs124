@@ -19,7 +19,8 @@ export default function MealPlanPage() {
     protein: 0,
     carbohydrates: 0,
     fat: 0,
-    sugar: 0
+    sugar: 0,
+    price: 0
   });
 
   useEffect(() => {
@@ -36,7 +37,7 @@ export default function MealPlanPage() {
 
   const loadRecipes = async () => {
     try {
-      const data = await api.getAvailableRecipes();
+      const data = await api.getAvailableRecipesForUser(userId);
       setRecipes(data.recipes);
     } catch (err) {
       console.error('Failed to load recipes:', err);
@@ -71,13 +72,15 @@ export default function MealPlanPage() {
         protein: acc.protein + curr.total_nutrition.protein,
         carbohydrates: acc.carbohydrates + curr.total_nutrition.carbohydrates,
         fat: acc.fat + curr.total_nutrition.fat,
-        sugar: acc.sugar + curr.total_nutrition.sugar
+        sugar: acc.sugar + curr.total_nutrition.sugar,
+        price: acc.price + curr.total_nutrition.price
       }), {
         calories: 0,
         protein: 0,
         carbohydrates: 0,
         fat: 0,
-        sugar: 0
+        sugar: 0,
+        price: 0
       });
       
       setWeeklyNutrition(weekTotal);
@@ -143,10 +146,13 @@ export default function MealPlanPage() {
           <h1 className="text-4xl font-bold">Weekly Meal Planner</h1>
           <div className="space-x-4">
             <button
-              onClick={loadMealPlans}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              onClick={() => {
+                console.log('Navigating to settings');
+                navigate('/settings');
+              }}
+              className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
             >
-              Refresh
+              To User Settings
             </button>
             <button
               onClick={() => navigate('/')}
@@ -188,7 +194,6 @@ export default function MealPlanPage() {
                                 ×
                               </button>
                             </div>
-                            
                           </div>
                         ))}
                       <button
@@ -235,7 +240,7 @@ export default function MealPlanPage() {
 
         {/* Nutrition Summary */}
         <div className="mt-6 bg-white rounded-lg shadow-lg p-6">
-          <h2 className="text-xl font-semibold mb-4">Weekly Nutrition Summary</h2>
+          <h2 className="text-xl font-semibold mb-4">Weekly Nutrition Summary (per 100g of food. The average adult consumes around 11 kilograms a week)</h2>
           <div className="grid grid-cols-5 gap-4">
             <div>
               <p className="text-gray-600">Total Calories: {Math.round(weeklyNutrition.calories)}C</p>
@@ -251,6 +256,9 @@ export default function MealPlanPage() {
             </div>
             <div>
               <p className="text-gray-600">Sugar: {Math.round(weeklyNutrition.sugar)}g</p>
+            </div>
+            <div>
+              <p className="text-gray-600">Price: ${Math.round(weeklyNutrition.price)}</p>
             </div>
           </div>
         </div>
