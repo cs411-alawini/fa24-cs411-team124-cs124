@@ -1,0 +1,82 @@
+CREATE TRIGGER meal_plan_forbidden
+BEFORE INSERT ON Meal_Plan FOR EACH ROW BEGIN
+IF EXISTS( SELECT DISTINCT ri.Ingredient_Name FROM Recipe_Ingredient ri INNER JOIN Users us ON (ri.Ingredient_Name LIKE CONCAT('%', us.Dietary_restrictions, '%')) WHERE ri.Recipe_id = NEW.Recipe_id AND us.User_id = NEW.User_id) THEN
+SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'your error message';
+END IF;
+END;
+
+CREATE PROCEDURE GetPriceCalorie()
+BEGIN
+DECLARE done INT default 0;
+DECLARE currRecipeId INT;
+DECLARE CalorieCurr FLOAT;
+DECLARE PriceCurr FLOAT;
+DECLARE TitleCurr varchar(127);
+DECLARE RecipeIdcur CURSOR FOR SELECT DISTINCT Recipe_Id FROM Recipe LIMIT 100;
+DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
+DROP TABLE IF EXISTS NewTable;
+CREATE TABLE NewTable( RecipeId INT Primary Key, Title varchar(127), Calorie FLOAT, Price FLOAT );
+OPEN RecipeIdcur;
+REPEAT
+FETCH RecipeIdcur INTO currRecipeId;
+SELECT SUM(Quantity * Price_per_100_g) FROM Recipe NATURAL JOIN Recipe_Ingredient NATURAL JOIN Ingredient_Price WHERE Recipe_id = currRecipeId INTO PriceCurr;
+SELECT SUM(Quantity * Kilocalories) FROM Recipe NATURAL JOIN Recipe_Ingredient NATURAL JOIN Ingredient_Nutrition WHERE Recipe_id = currRecipeId INTO CalorieCurr;
+SELECT Title FROM Recipe WHERE Recipe_id = currRecipeId INTO TitleCurr;
+INSERT IGNORE INTO NewTable VALUE (currRecipeId, TitleCurr, CalorieCurr, PriceCurr);
+UNTIL done
+END REPEAT;
+close RecipeIdcur;
+SELECT RecipeId, Title, Calorie, Price FROM NewTable;
+END;
+
+SELECT Recipe_id, Title, Instructions, Image_name 
+FROM Recipe
+LIMIT 9;
+
+SELECT Recipe_id, Title, Instructions, Image_name
+FROM Recipe 
+WHERE Recipe_id = :recipe_id;
+
+SELECT mp.Meal_plan_id, mp.Recipe_id, mp.Date, mp.Time, r.Title FROM Meal_Plan mp
+JOIN Recipe r ON mp.Recipe_id = r.Recipe_id
+WHERE mp.User_id = :user_id;
+
+SELECT Meal_plan_id FROM Meal_Plan 
+WHERE User_id = :user_id
+AND Date = :date
+AND Time = :time;
+
+UPDATE Meal_Plan
+SET Recipe_id = :recipe_id
+WHERE User_id = :user_id AND Date = :date AND Time = :time;
+
+INSERT INTO Meal_Plan (User_id, Date, Time, Recipe_id)
+VALUES (:user_id, :date, :time, :recipe_id);
+
+DELETE FROM Meal_Plan
+WHERE Meal_plan_id = :plan_id;
+
+SELECT r.Recipe_id, r.Title, ri.Ingredient_Name, ri.Quantity, ri.Unit, in_n.Carbohydrates, in_n.Protein, in_n.Total_fat, in_n.Kilocalories, in_n.Sugar
+FROM Meal_Plan mp
+JOIN Recipe r ON mp.Recipe_id = r.Recipe_id
+JOIN Recipe_Ingredient ri ON r.Recipe_id = ri.Recipe_id
+JOIN Ingredient_Nutrition in_n ON ri.Ingredient_Name = in_n.Ingredient_Name
+WHERE mp.Meal_plan_id = :plan_id;
+
+SELECT User_id, Username 
+FROM Users 
+WHERE Username = :username;
+
+SELECT User_id FROM Users 
+WHERE Username = :username;
+
+INSERT INTO Users (User_id, Username, Dietary_restrictions, Budget_goal, Nutrition_goals)
+VALUES (:user_id, :username, :dietary, :budget, :nutrition);
+
+SELECT Username, Dietary_restrictions, Budget_goal, Nutrition_goals 
+FROM Users 
+WHERE User_id = :user_id;
+
+UPDATE Users 
+SET Dietary_restrictions = :dietary, Budget_goal = :budget, Nutrition_goals = :nutrition
+WHERE User_id = :user_id
